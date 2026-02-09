@@ -92,7 +92,7 @@ const uint8_t patternCount = ARRAY_SIZE(patterns);
 
 void setup() {
   Serial.begin(115200);
-  //  delay(3000);
+  delay(3000);
 
   if (!touch0.begin())
     Serial.println("Failed to begin qt on pin A3");
