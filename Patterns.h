@@ -716,6 +716,64 @@ void spiralAnimation()
   }
 }
 
+// Swirl - adapted from Aurora PatternSwirl
+// Original: https://github.com/pixelmatix/aurora
+// Copyright (c) 2014 Jason Coon, Mark Kriegsman (SmartMatrixSwirl)
+// Six symmetric bouncing dots with fading trails.
+// Adapted for Fibonacci128 - proximity-based LED rendering replaces blur2d.
+
+#define SWIRL_DOTS 6
+
+void swirlAnimation()
+{
+  // Oscillating fade replaces blur2d (lossy blur trends toward black)
+  uint8_t blurAmount = beatsin8(2, 10, 128);
+  fadeToBlackBy(leds, NUM_LEDS, 256 - blurAmount);
+
+  // Two out-of-sync sine waves for base positions (scaled to 0-255)
+  uint8_t si = beatsin8(27, 16, 240);
+  uint8_t sj = beatsin8(41, 16, 240);
+  // Reflections
+  uint8_t ni = 255 - si;
+  uint8_t nj = 255 - sj;
+
+  // 6 symmetric dot positions
+  int16_t dotPosX[SWIRL_DOTS] = { si, sj, ni, nj, si, ni };
+  int16_t dotPosY[SWIRL_DOTS] = { sj, si, nj, ni, nj, sj };
+
+  // Each dot shifts color at a different rate
+  uint16_t ms = millis();
+  uint8_t colorIdx[SWIRL_DOTS];
+  colorIdx[0] = ms / 11;
+  colorIdx[1] = ms / 13;
+  colorIdx[2] = ms / 17;
+  colorIdx[3] = ms / 29;
+  colorIdx[4] = ms / 37;
+  colorIdx[5] = ms / 41;
+
+  CRGB dotColors[SWIRL_DOTS];
+  for (uint8_t d = 0; d < SWIRL_DOTS; d++) {
+    dotColors[d] = ColorFromPalette(gCurrentPalette, colorIdx[d]);
+  }
+
+  const int32_t proxSq = 400L; // 20^2
+
+  for (uint16_t i = 0; i < NUM_LEDS; i++) {
+    int16_t lx = coordsX[i];
+    int16_t ly = coordsY[i];
+
+    for (uint8_t d = 0; d < SWIRL_DOTS; d++) {
+      int16_t dx = lx - dotPosX[d];
+      int16_t dy = ly - dotPosY[d];
+      int32_t dSq = (int32_t)dx * dx + (int32_t)dy * dy;
+      if (dSq < proxSq) {
+        uint8_t bri = (uint8_t)(255L * (proxSq - dSq) / proxSq);
+        leds[i] += CRGB(scale8(dotColors[d].r, bri), scale8(dotColors[d].g, bri), scale8(dotColors[d].b, bri));
+      }
+    }
+  }
+}
+
 // --- Pattern Rotation System ---
 // Maximum rotation speed in radians per frame (tune this to taste)
 float patternMaxRotSpeed = 0.05f;
