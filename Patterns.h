@@ -812,6 +812,7 @@ struct PatternRotation {
 
 #include "PatternWave.h"
 #include "PatternSublime.h"
+#include "PatternFibonacciSpiral.h"
 
 // Electric Mandala - adapted from Aurora PatternElectricMandala
 // Original: https://github.com/pixelmatix/aurora

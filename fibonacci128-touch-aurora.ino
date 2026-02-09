@@ -83,16 +83,16 @@ static uint8_t hue = 0;
 #include "Patterns.h"
 
 typedef void (*SimplePatternList[])();
-SimplePatternList patterns = { sublimeVerticalFireAnimation, sublimeFireAnimation, sublimeRainAnimation, sublimeJuggleAnimation, sublimeBpmAnimation, sublimeSinelonAnimation, waveAnimation, swirlAnimation, spiralAnimation, radarAnimation, pendulumWaveAnimation, incrementalDrift2Animation, incrementalDriftAnimation, attractAnimation, electricMandalaAnimation, auroraPlasmaAnimation, flockAnimation, cubeAnimation, plasmaAnimation, colorWavesFibonacci, prideFibonacci, outwardPalettes, rotatingPalettes, outwardRainbow, rotatingRainbow };
+SimplePatternList patterns = { fibonacciSpiralAnimation, fibonacciChaseAnimation, sublimeVerticalFireAnimation, sublimeFireAnimation, sublimeRainAnimation, sublimeJuggleAnimation, sublimeBpmAnimation, sublimeSinelonAnimation, waveAnimation, swirlAnimation, spiralAnimation, radarAnimation, pendulumWaveAnimation, incrementalDrift2Animation, incrementalDriftAnimation, attractAnimation, electricMandalaAnimation, auroraPlasmaAnimation, flockAnimation, cubeAnimation, plasmaAnimation, colorWavesFibonacci, prideFibonacci, outwardPalettes, rotatingPalettes, outwardRainbow, rotatingRainbow };
 
-const char* const patternNames[] = { "sublimeVerticalFire", "sublimeFire", "sublimeRain", "sublimeJuggle", "sublimeBpm", "sublimeSinelon", "wave", "swirl", "spiral", "radar", "pendulumWave", "incrementalDrift2", "incrementalDrift", "attract", "electricMandala", "auroraPlasma", "flock", "cube", "plasma", "colorWavesFibonacci", "prideFibonacci", "outwardPalettes", "rotatingPalettes", "outwardRainbow", "rotatingRainbow" };
+const char* const patternNames[] = { "fibonacciSpiral", "fibonacciChase", "sublimeVerticalFire", "sublimeFire", "sublimeRain", "sublimeJuggle", "sublimeBpm", "sublimeSinelon", "wave", "swirl", "spiral", "radar", "pendulumWave", "incrementalDrift2", "incrementalDrift", "attract", "electricMandala", "auroraPlasma", "flock", "cube", "plasma", "colorWavesFibonacci", "prideFibonacci", "outwardPalettes", "rotatingPalettes", "outwardRainbow", "rotatingRainbow" };
 
 uint8_t currentPatternIndex = 0;
 const uint8_t patternCount = ARRAY_SIZE(patterns);
 
 void setup() {
   Serial.begin(115200);
-  delay(3000);
+  delay(500);
 
   if (!touch0.begin())
     Serial.println("Failed to begin qt on pin A3");
