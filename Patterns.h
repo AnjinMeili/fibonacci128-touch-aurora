@@ -810,6 +810,9 @@ struct PatternRotation {
   }
 };
 
+#include "PatternWave.h"
+#include "PatternSublime.h"
+
 // Electric Mandala - adapted from Aurora PatternElectricMandala
 // Original: https://github.com/pixelmatix/aurora
 // Copyright (c) 2014 Jason Coon, Stefan Petrick (FunkyNoise)
