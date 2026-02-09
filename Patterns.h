@@ -602,6 +602,120 @@ void incrementalDrift2Animation()
   }
 }
 
+// Pendulum Wave - adapted from Aurora PatternPendulumWave
+// Original: https://github.com/pixelmatix/aurora
+// Copyright (c) 2014 Jason Coon, Lunarch Studios (CC0 1.0)
+// Dots at evenly spaced positions swing at incrementally different frequencies.
+// Adapted for Fibonacci128 - 32 pendulums across x-axis, proximity-based LED rendering.
+
+#define PENDULUM_COUNT 32
+
+void pendulumWaveAnimation()
+{
+  fadeToBlackBy(leds, NUM_LEDS, 85); // DimAll(170)
+
+  // Precompute pendulum positions and colors
+  int16_t penX[PENDULUM_COUNT], penY[PENDULUM_COUNT];
+  CRGB penColor[PENDULUM_COUNT];
+
+  for (uint8_t i = 0; i < PENDULUM_COUNT; i++) {
+    penX[i] = i * 8; // evenly spaced across 0-248
+    penY[i] = beatsin16(i + 1, 0, 255); // each swings at frequency i+1 BPM
+    penColor[i] = ColorFromPalette(gCurrentPalette, i * 7);
+  }
+
+  const int32_t proxSq = 400L; // 20^2
+
+  // Single pass over LEDs
+  for (uint16_t j = 0; j < NUM_LEDS; j++) {
+    int16_t lx = coordsX[j];
+    int16_t ly = coordsY[j];
+
+    for (uint8_t p = 0; p < PENDULUM_COUNT; p++) {
+      int16_t dx = lx - penX[p];
+      int16_t dy = ly - penY[p];
+      int32_t dSq = (int32_t)dx * dx + (int32_t)dy * dy;
+      if (dSq < proxSq) {
+        uint8_t bri = (uint8_t)(255L * (proxSq - dSq) / proxSq);
+        leds[j] += CRGB(scale8(penColor[p].r, bri), scale8(penColor[p].g, bri), scale8(penColor[p].b, bri));
+      }
+    }
+  }
+}
+
+// Radar - adapted from Aurora PatternRadar
+// Original: https://github.com/pixelmatix/aurora
+// Copyright (c) 2014 Jason Coon
+// Sweeping radar arm with fading trail, colored by radius through the palette.
+// Adapted for Fibonacci128 - uses angles[] array for natural radial sweep.
+
+void radarAnimation()
+{
+  static byte radarTheta = 0;
+  static byte radarHueOffset = 0;
+
+  fadeToBlackBy(leds, NUM_LEDS, 3); // very slow fade for long radar trail
+
+  EVERY_N_MILLIS(25) {
+    radarTheta += 2;
+    radarHueOffset += 1;
+  }
+
+  for (uint16_t i = 0; i < NUM_LEDS; i++) {
+    // Shortest angular distance from sweep line (0-128)
+    int16_t diff = (int16_t)angles[i] - (int16_t)radarTheta;
+    if (diff < 0) diff += 256;
+    if (diff > 128) diff = 256 - diff;
+
+    if (diff < 8) { // narrow sweep arc (~11 degrees)
+      uint8_t bri = 255 - diff * 32;
+      // Color shifts with radius and time, matching original's per-ring hue offset
+      byte colorIdx = 255 - (radius[i] + radarHueOffset);
+      CRGB color = ColorFromPalette(gCurrentPalette, colorIdx);
+      leds[i] += CRGB(scale8(color.r, bri), scale8(color.g, bri), scale8(color.b, bri));
+    }
+  }
+}
+
+// Spiral - adapted from Aurora PatternSpiral
+// Original: https://github.com/pixelmatix/aurora
+// Copyright (c) 2014 Stefan Petrick (Funky Clouds)
+// Rotating spiral arms with oscillating tightness and width.
+// Adapted for Fibonacci128 - uses angles[]/radius[] for natural spiral rendering.
+
+void spiralAnimation()
+{
+  fadeToBlackBy(leds, NUM_LEDS, 31); // DimAll(224)
+
+  // Oscillating parameters for organic movement (inspired by original's 5 oscillators)
+  uint8_t baseAngle = beat8(7);            // rotation speed
+  uint8_t tightness = beatsin8(3, 1, 3);   // spiral tightness oscillates
+  uint8_t colorPhase = beat8(11);           // color cycling
+  uint8_t armWidth = beatsin8(5, 10, 20);  // arm width breathes
+
+  for (uint16_t i = 0; i < NUM_LEDS; i++) {
+    uint8_t r = radius[i];
+    uint8_t a = angles[i];
+
+    // Two spiral arms, 180 degrees apart
+    for (uint8_t arm = 0; arm < 2; arm++) {
+      uint8_t spiralAngle = baseAngle + r * tightness + arm * 128;
+
+      // Shortest angular distance
+      int16_t diff = (int16_t)a - (int16_t)spiralAngle;
+      if (diff < 0) diff += 256;
+      if (diff > 128) diff = 256 - diff;
+
+      if (diff < armWidth) {
+        uint8_t bri = (uint8_t)(255L * (armWidth - diff) / armWidth);
+        byte colorIdx = r + colorPhase + arm * 80;
+        CRGB color = ColorFromPalette(gCurrentPalette, colorIdx);
+        leds[i] += CRGB(scale8(color.r, bri), scale8(color.g, bri), scale8(color.b, bri));
+      }
+    }
+  }
+}
+
 // --- Pattern Rotation System ---
 // Maximum rotation speed in radians per frame (tune this to taste)
 float patternMaxRotSpeed = 0.05f;

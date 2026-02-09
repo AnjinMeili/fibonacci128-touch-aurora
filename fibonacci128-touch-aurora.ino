@@ -83,7 +83,7 @@ static uint8_t hue = 0;
 #include "Patterns.h"
 
 typedef void (*SimplePatternList[])();
-SimplePatternList patterns = { incrementalDrift2Animation, incrementalDriftAnimation, attractAnimation, electricMandalaAnimation, auroraPlasmaAnimation, flockAnimation, cubeAnimation, plasmaAnimation, colorWavesFibonacci, prideFibonacci, outwardPalettes, rotatingPalettes, outwardRainbow, rotatingRainbow };
+SimplePatternList patterns = { spiralAnimation, radarAnimation, pendulumWaveAnimation, incrementalDrift2Animation, incrementalDriftAnimation, attractAnimation, electricMandalaAnimation, auroraPlasmaAnimation, flockAnimation, cubeAnimation, plasmaAnimation, colorWavesFibonacci, prideFibonacci, outwardPalettes, rotatingPalettes, outwardRainbow, rotatingRainbow };
 
 uint8_t currentPatternIndex = 0;
 const uint8_t patternCount = ARRAY_SIZE(patterns);
